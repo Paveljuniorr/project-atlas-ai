@@ -1,0 +1,40 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+html {
+  scroll-behavior: smooth;
+  background-color: #060815;
+  color: #ffffff;
+}
+
+body {
+  @apply bg-[#060815] text-white antialiased;
+  color: #ffffff !important;
+}
+
+h1, h2, h3, h4, h5, h6, p, span, label, input, textarea, select, button {
+  color: #ffffff;
+}
+
+.text-muted, .text-gray-500, .text-zinc-400, .text-gray-400 {
+  color: rgba(255, 255, 255, 0.75) !important;
+}
+
+::selection {
+  background: rgba(99, 102, 241, 0.35);
+  color: #ffffff;
+}
+
+.bg-grid {
+  background-image:
+    linear-gradient(to right, rgba(99,102,241,0.18) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(99,102,241,0.18) 1px, transparent 1px);
+  background-size: 48px 48px;
+}
+
+
