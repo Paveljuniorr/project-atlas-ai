@@ -1,16 +1,30 @@
-import { SignIn } from "@clerk/nextjs";
+import { signIn } from "next-auth/react";
+import Link from "next/link";
+import { Sparkles } from "lucide-react";
 
 export default function Page() {
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-[#060815] text-white p-4">
+    <div className="flex min-h-screen flex-col items-center justify-center bg-slate-50 text-slate-900 p-4">
       <div className="mb-6 text-center max-w-md">
-        <h1 className="text-3xl font-bold text-white mb-2">Welcome to Project Atlas AI</h1>
-        <p className="text-white/80 text-sm">Sign in to manage your AI leads and workflows</p>
+        <Link href="/" className="inline-flex items-center gap-2 font-bold text-slate-900 mb-4">
+          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-indigo-600 text-white font-bold shadow-sm">
+            <Sparkles className="size-5" />
+          </div>
+          <span className="text-xl font-bold text-slate-900">Project Atlas AI</span>
+        </Link>
+        <h1 className="text-2xl font-bold tracking-tight text-slate-900 mb-1">Sign in to your Workspace</h1>
+        <p className="text-slate-500 text-sm">Continue with Google to access your AI pipeline and leads</p>
       </div>
-      <div className="rounded-2xl border border-white/10 bg-black/40 p-2 shadow-2xl backdrop-blur">
-        <SignIn />
+      <div className="rounded-2xl border border-slate-200 bg-white p-2 shadow-xl">
+        <button
+          onClick={() => signIn("google")}
+          className="w-full rounded-md bg-indigo-600 px-4 py-2 text-white hover:bg-indigo-700"
+        >
+          Continue with Google
+        </button>
       </div>
     </div>
   );
 }
+
 

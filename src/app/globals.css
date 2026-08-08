@@ -3,38 +3,54 @@
 @tailwind utilities;
 
 :root {
-  color-scheme: dark;
+  color-scheme: light;
 }
 
 html {
   scroll-behavior: smooth;
-  background-color: #060815;
-  color: #ffffff;
+  background-color: #f8fafc;
+  color: #0f172a;
 }
 
 body {
-  @apply bg-[#060815] text-white antialiased;
-  color: #ffffff !important;
-}
-
-h1, h2, h3, h4, h5, h6, p, span, label, input, textarea, select, button {
-  color: #ffffff;
-}
-
-.text-muted, .text-gray-500, .text-zinc-400, .text-gray-400 {
-  color: rgba(255, 255, 255, 0.75) !important;
+  @apply bg-slate-50 text-slate-900 antialiased font-sans;
 }
 
 ::selection {
-  background: rgba(99, 102, 241, 0.35);
-  color: #ffffff;
+  background: rgba(99, 102, 241, 0.2);
+  color: #4f46e5;
 }
 
-.bg-grid {
-  background-image:
-    linear-gradient(to right, rgba(99,102,241,0.18) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(99,102,241,0.18) 1px, transparent 1px);
-  background-size: 48px 48px;
+.bg-dot-grid {
+  background-image: radial-gradient(rgba(148, 163, 184, 0.25) 1px, transparent 1px);
+  background-size: 24px 24px;
 }
+
+.bg-line-grid {
+  background-image:
+    linear-gradient(to right, rgba(226, 232, 240, 0.8) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(226, 232, 240, 0.8) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
 
 

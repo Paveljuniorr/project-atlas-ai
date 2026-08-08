@@ -1,4 +1,4 @@
-import { ClerkProvider } from '@clerk/nextjs';
+import { SessionProvider } from "next-auth/react";
 import type { Metadata } from 'next';
 import './globals.css';
 
@@ -41,11 +41,11 @@ export default function RootLayout({
   children
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <ClerkProvider>
-      <html lang="en">
-        <body>{children}</body>
+    <SessionProvider>
+      <html lang="en" className="h-full bg-slate-50">
+        <body className="min-h-screen bg-slate-50 text-slate-900 antialiased">{children}</body>
       </html>
-    </ClerkProvider>
+    </SessionProvider>
   );
 }
 

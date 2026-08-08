@@ -1,229 +1,107 @@
 'use client';
 
-import { useMemo, useState } from 'react';
-import { ArrowRight, Sparkles } from 'lucide-react';
-import Reveal from '@/components/ui/Reveal';
+import { Sparkles, ArrowRight, ShieldCheck, Zap, Bot, Users, BarChart3, Check } from 'lucide-react';
 import Link from 'next/link';
-
-function NetworkBg() {
-  const dots = useMemo(() => {
-    const out: Array<{ x: number; y: number; s: number; o: number }> = [];
-    for (let i = 0; i < 70; i++) {
-      out.push({
-        x: Math.random() * 100,
-        y: Math.random() * 100,
-        s: 1 + Math.random() * 2,
-        o: 0.25 + Math.random() * 0.6
-      });
-    }
-    return out;
-  }, []);
-
-  return (
-    <div className="pointer-events-none absolute inset-0 overflow-hidden">
-      <div className="absolute -top-24 left-1/2 w-[860px] h-[860px] -translate-x-1/2 rounded-full bg-[radial-gradient(circle_at_center,rgba(99,102,241,0.35),transparent_60%)] blur-2xl" />
-      <div className="absolute inset-0 opacity-70 bg-grid" />
-      <div className="absolute inset-0">
-        <svg className="absolute inset-0 h-full w-full" viewBox="0 0 100 100" preserveAspectRatio="none">
-          {dots.map((d, idx) => (
-            <g key={idx}>
-              <circle cx={d.x} cy={d.y} r={d.s * 0.22} fill="rgba(99,102,241,0.9)" opacity={d.o} />
-            </g>
-          ))}
-          <path
-            d="M5 65 C 20 55, 35 45, 52 53 S 80 70, 95 60"
-            fill="none"
-            stroke="rgba(34,211,238,0.35)"
-            strokeWidth="0.6"
-          />
-          <path
-            d="M8 35 C 28 25, 44 30, 55 40 S 82 60, 92 44"
-            fill="none"
-            stroke="rgba(168,85,247,0.35)"
-            strokeWidth="0.6"
-          />
-        </svg>
-      </div>
-      <div className="absolute inset-0 bg-gradient-to-b from-black/0 via-black/10 to-[#060815]" />
-    </div>
-  );
-}
+import { useAuth } from '@clerk/nextjs';
 
 export default function Hero() {
-  const [trustedIndex, setTrustedIndex] = useState(0);
-  const trust = [
-    'Built for speed',
-    'Lead capture focused',
-    'Automation-first design',
-    'Enterprise-ready delivery'
-  ];
+  const { isSignedIn } = useAuth();
 
   return (
-    <section className="relative pt-24 sm:pt-28">
-      <NetworkBg />
+    <section className="relative pt-32 pb-20 overflow-hidden bg-slate-50 border-b border-slate-200/80">
+      <div className="absolute inset-0 bg-dot-grid opacity-60 pointer-events-none" />
+      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] bg-indigo-500/10 blur-[120px] rounded-full pointer-events-none" />
 
-      <div className="mx-auto max-w-6xl px-4 sm:px-6">
-        <div className="grid items-center gap-10 lg:grid-cols-2">
-          <div>
-            <Reveal delayMs={60}>
-              <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-white/75">
-                <Sparkles className="size-3.5 text-electricBlue" />
-                Premium AI automation for modern teams
-              </div>
-            </Reveal>
-
-            <Reveal delayMs={120} className="mt-6">
-              <h1 className="text-4xl font-semibold tracking-tight md:text-5xl lg:text-6xl">
-                Automate Your Business With <span className="text-transparent bg-clip-text bg-gradient-to-r from-electricBlue via-purple-500 to-cyan-400">AI</span>
-              </h1>
-            </Reveal>
-
-            <Reveal delayMs={180} className="mt-5">
-              <p className="text-white/75 text-base md:text-lg leading-relaxed max-w-xl">
-                Project Atlas AI builds intelligent automation systems that help
-                businesses respond faster, manage leads, and eliminate repetitive work.
-              </p>
-            </Reveal>
-
-            <Reveal delayMs={240} className="mt-8">
-              <div className="flex flex-wrap gap-3">
-                <Link
-                  href="/dashboard"
-                  className="inline-flex items-center justify-center rounded-xl bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 px-5 py-3 text-sm font-semibold text-white shadow-glow hover:brightness-110 transition"
-                >
-                  Access Dashboard <ArrowRight className="ml-2 size-4" />
-                </Link>
-                <Link
-                  href="/sign-in"
-                  className="inline-flex items-center justify-center rounded-xl border border-white/20 bg-white/10 px-5 py-3 text-sm font-semibold text-white hover:bg-white/20 transition"
-                >
-                  Sign In
-                </Link>
-                <Link
-                  href="/sign-up"
-                  className="inline-flex items-center justify-center rounded-xl border border-white/20 bg-white/10 px-5 py-3 text-sm font-semibold text-white hover:bg-white/20 transition"
-                >
-                  Sign Up
-                </Link>
-                <Link
-                  href="#demo"
-                  className="inline-flex items-center justify-center rounded-xl border border-white/15 bg-white/5 px-5 py-3 text-sm font-semibold text-white/90 hover:bg-white/10 transition"
-                >
-                  Book Demo
-                </Link>
-              </div>
-            </Reveal>
-
-            <Reveal delayMs={300} className="mt-8">
-              <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-                <div className="flex -space-x-2">
-                  {['#8b5cf6', '#22d3ee', '#60a5fa'].map((c, i) => (
-                    <span
-                      key={i}
-                      className="inline-grid size-9 place-items-center rounded-full border border-white/15 bg-black/30"
-                      style={{ boxShadow: `0 0 0 3px rgba(255,255,255,0.02), 0 0 40px ${c}33` }}
-                    >
-                      <span className="size-2.5 rounded-full bg-gradient-to-r from-electricBlue to-purple-500" />
-                    </span>
-                  ))}
-                </div>
-                <div>
-                  <div className="text-sm font-semibold">Trusted by teams that move fast</div>
-                  <div className="text-sm text-white/65">
-                    {trust[trustedIndex]} • Built with privacy-first design
-                  </div>
-                </div>
-              </div>
-            </Reveal>
+      <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="text-center max-w-3xl mx-auto">
+          <div className="inline-flex items-center gap-2 rounded-full border border-indigo-200 bg-indigo-50/80 px-3.5 py-1 text-xs font-semibold text-indigo-700 mb-6">
+            <Sparkles className="size-3.5 text-indigo-600" />
+            AI-Driven Revenue & Lead Automation Engine
           </div>
 
-          <Reveal delayMs={120}>
-            <div className="relative">
-              <div className="absolute -inset-6 rounded-[2rem] bg-gradient-to-r from-electricBlue/20 via-purple-500/20 to-cyan-400/20 blur-2xl" />
-              <div className="relative rounded-[2rem] border border-white/10 bg-black/30 backdrop-blur p-5 shadow-glow">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <span className="h-2 w-2 rounded-full bg-[#22c55e]" />
-                    <span className="h-2 w-2 rounded-full bg-[#f59e0b]" />
-                    <span className="h-2 w-2 rounded-full bg-[#ef4444]" />
-                  </div>
-                  <div className="text-xs text-white/60">Atlas Console</div>
-                </div>
+          <h1 className="text-4xl font-extrabold tracking-tight text-slate-900 sm:text-5xl lg:text-6xl">
+            Autonomous Lead Acquisition & <span className="text-indigo-600">AI CRM Workflows</span>
+          </h1>
 
-                <div className="mt-5 grid gap-4 md:grid-cols-2">
-                  <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-                    <div className="text-xs text-white/60">Lead response</div>
-                    <div className="mt-2 flex items-end gap-2">
-                      <div className="text-3xl font-semibold">2m</div>
-                      <div className="text-sm text-white/60 pb-1">avg time</div>
-                    </div>
-                    <div className="mt-3 h-2 rounded-full bg-white/10 overflow-hidden">
-                      <div className="h-full w-3/4 bg-gradient-to-r from-electricBlue via-purple-500 to-cyan-400" />
-                    </div>
-                  </div>
+          <p className="mt-6 text-lg text-slate-600 leading-relaxed max-w-2xl mx-auto">
+            Project Atlas AI instantly qualifies leads, powers autonomous multi-channel conversations, and automates sales pipeline actions for high-velocity teams.
+          </p>
 
-                  <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-                    <div className="text-xs text-white/60">Automation coverage</div>
-                    <div className="mt-2 flex items-end gap-2">
-                      <div className="text-3xl font-semibold">87%</div>
-                      <div className="text-sm text-white/60 pb-1">workflows</div>
-                    </div>
-                    <div className="mt-3 h-2 rounded-full bg-white/10 overflow-hidden">
-                      <div className="h-full w-11/14 bg-gradient-to-r from-purple-500 via-electricBlue to-cyan-400" />
-                    </div>
-                  </div>
+          <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
+            {!isSignedIn ? (
+              <Link
+                href="/sign-in"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 rounded-xl bg-indigo-600 px-6 py-3.5 text-base font-semibold text-white shadow-md hover:bg-indigo-700 transition"
+              >
+                <svg className="size-5" viewBox="0 0 24 24">
+                  <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                  <path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                  <path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+                  <path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+                </svg>
+                Continue with Google
+              </Link>
+            ) : (
+              <Link
+                href="/dashboard"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl bg-indigo-600 px-6 py-3.5 text-base font-semibold text-white shadow-md hover:bg-indigo-700 transition"
+              >
+                Go to Workspace Dashboard <ArrowRight className="size-5" />
+              </Link>
+            )}
 
-                  <div className="md:col-span-2 rounded-2xl border border-white/10 bg-white/5 p-4">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <div className="text-xs text-white/60">Next best actions</div>
-                        <div className="mt-1 text-sm font-semibold">AI agent pipeline</div>
-                      </div>
-                      <div className="rounded-full border border-white/10 bg-black/20 px-3 py-1 text-xs text-white/70">
-                        Live
-                      </div>
-                    </div>
-                    <div className="mt-4 grid gap-3 sm:grid-cols-3">
-                      {[
-                        { t: 'Qualify leads', p: 'Instant scoring & routing' },
-                        { t: 'Support replies', p: '24/7 answers with context' },
-                        { t: 'Ops automation', p: 'Workflows across your stack' }
-                      ].map((x) => (
-                        <div key={x.t} className="rounded-xl bg-black/20 border border-white/10 p-3">
-                          <div className="text-xs font-semibold">{x.t}</div>
-                          <div className="mt-1 text-xs text-white/60">{x.p}</div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
+            <Link
+              href="/dashboard"
+              className="w-full sm:w-auto inline-flex items-center justify-center rounded-xl border border-slate-300 bg-white px-6 py-3.5 text-base font-semibold text-slate-700 hover:bg-slate-50 transition shadow-sm"
+            >
+              Explore Interactive Platform
+            </Link>
+          </div>
 
-                <div className="mt-4 rounded-2xl border border-white/10 bg-black/20 p-4">
-                  <div className="flex items-center justify-between">
-                    <div className="text-sm font-semibold">Neural workflow simulation</div>
-                    <button
-                      className="text-xs rounded-full border border-white/10 bg-white/5 px-3 py-1 text-white/75 hover:bg-white/10 transition"
-                      onClick={() => setTrustedIndex((i) => (i + 1) % trust.length)}
-                    >
-                      Cycle status
-                    </button>
-                  </div>
-                  <div className="mt-3 h-28 rounded-xl bg-gradient-to-br from-electricBlue/10 via-purple-500/10 to-cyan-400/10 border border-white/10 relative overflow-hidden">
-                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(34,211,238,0.35),transparent_45%)]" />
-                    <div className="absolute inset-0 opacity-70">
-                      <div className="absolute left-6 top-6 animate-floaty h-3 w-3 rounded-full bg-electricBlue/80" />
-                      <div className="absolute right-8 top-14 animate-floaty delay-150 h-2.5 w-2.5 rounded-full bg-purple-500/80" />
-                      <div className="absolute left-14 bottom-10 animate-floaty delay-300 h-2.5 w-2.5 rounded-full bg-cyan-400/80" />
-                    </div>
-                    <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-black/35 to-transparent" />
-                  </div>
-                </div>
+          <div className="mt-6 flex items-center justify-center gap-6 text-xs font-medium text-slate-500">
+            <span className="flex items-center gap-1.5"><Check className="size-4 text-emerald-600" /> Instant Google Single Sign-On</span>
+            <span className="flex items-center gap-1.5"><Check className="size-4 text-emerald-600" /> Automatic Org & Workspace Provisioning</span>
+          </div>
+        </div>
+
+        {/* Product Preview Card */}
+        <div id="solution" className="mt-14 relative rounded-2xl border border-slate-200/80 bg-white p-3 shadow-2xl">
+          <div className="rounded-xl border border-slate-200/60 bg-slate-50 p-4 sm:p-6">
+            <div className="flex items-center justify-between border-b border-slate-200 pb-4 mb-6">
+              <div className="flex items-center gap-2">
+                <span className="size-3 rounded-full bg-slate-300" />
+                <span className="size-3 rounded-full bg-slate-300" />
+                <span className="size-3 rounded-full bg-slate-300" />
+                <span className="ml-2 text-xs font-semibold text-slate-400">Atlas AI Workspace Engine</span>
+              </div>
+              <div className="inline-flex items-center gap-1.5 rounded-md bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700 border border-emerald-200">
+                <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                System Active
               </div>
             </div>
-          </Reveal>
+
+            <div className="grid gap-4 sm:grid-cols-3">
+              <div className="rounded-xl bg-white p-4 border border-slate-200 shadow-sm">
+                <div className="text-xs font-medium text-slate-500">Monthly Recurring Revenue</div>
+                <div className="mt-1 text-2xl font-bold text-slate-900">$128,450</div>
+                <div className="mt-2 text-xs font-semibold text-emerald-600">+14.2% from last month</div>
+              </div>
+              <div className="rounded-xl bg-white p-4 border border-slate-200 shadow-sm">
+                <div className="text-xs font-medium text-slate-500">Qualified Leads Captured</div>
+                <div className="mt-1 text-2xl font-bold text-slate-900">1,248</div>
+                <div className="mt-2 text-xs font-semibold text-indigo-600">89% AI qualification rate</div>
+              </div>
+              <div className="rounded-xl bg-white p-4 border border-slate-200 shadow-sm">
+                <div className="text-xs font-medium text-slate-500">Avg. AI Response Time</div>
+                <div className="mt-1 text-2xl font-bold text-slate-900">1.8s</div>
+                <div className="mt-2 text-xs font-semibold text-slate-600">24/7 Autonomous agent</div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </section>
   );
 }
+
 
