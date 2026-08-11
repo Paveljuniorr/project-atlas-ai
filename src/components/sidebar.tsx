@@ -18,6 +18,7 @@ import {
   Globe,
   Bell,
   Calendar,
+  CheckSquare,
   Layers
 } from "lucide-react";
 import { clsx } from "clsx";
@@ -26,6 +27,8 @@ const mainNavItems = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
   { name: "Lead Pipeline", href: "/leads", icon: Users, badge: "1,248" },
   { name: "AI Conversations", href: "/inbox", icon: Inbox, badge: "42" },
+  { name: "Meetings", href: "/meetings", icon: Calendar, badge: "3 Today" },
+  { name: "Workspace Tasks", href: "/tasks", icon: CheckSquare, badge: "4 Pending" },
   { name: "Analytics & MRR", href: "/analytics", icon: BarChart2 },
   { name: "Workspace Settings", href: "/settings", icon: Settings },
 ];
