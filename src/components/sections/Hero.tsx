@@ -2,10 +2,11 @@
 
 import { Sparkles, ArrowRight, ShieldCheck, Zap, Bot, Users, BarChart3, Check } from 'lucide-react';
 import Link from 'next/link';
-import { useAuth } from '@clerk/nextjs';
+import { useSession } from 'next-auth/react';
 
 export default function Hero() {
-  const { isSignedIn } = useAuth();
+  const { data: session } = useSession();
+  const isSignedIn = !!session;
 
   return (
     <section className="relative pt-32 pb-20 overflow-hidden bg-slate-50 border-b border-slate-200/80">
@@ -103,5 +104,3 @@ export default function Hero() {
     </section>
   );
 }
-
-

@@ -1,14 +1,12 @@
 "use server";
 
 import { createServerServiceClient } from "@/lib/supabase";
-import { auth } from "@clerk/nextjs/server";
+import { getAuthSession } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
 
 export async function getConversations() {
-  const { userId, orgId } = await auth();
-  if (!userId) throw new Error("Unauthorized");
+  const { userId } = await getAuthSession();
 
-  const effectiveOrgId = orgId || "default-org-id";
   const supabase = createServerServiceClient();
 
   const { data: conversations, error } = await supabase
@@ -27,7 +25,6 @@ export async function getConversations() {
         source
       )
     `)
-    // .eq("org_id", effectiveOrgId)
     .order("updated_at", { ascending: false });
 
   if (error) {
@@ -39,8 +36,7 @@ export async function getConversations() {
 }
 
 export async function getConversationMessages(conversationId: string) {
-  const { userId } = await auth();
-  if (!userId) throw new Error("Unauthorized");
+  const { userId } = await getAuthSession();
 
   const supabase = createServerServiceClient();
 
@@ -59,8 +55,7 @@ export async function getConversationMessages(conversationId: string) {
 }
 
 export async function markConversationRead(conversationId: string) {
-  const { userId } = await auth();
-  if (!userId) throw new Error("Unauthorized");
+  const { userId } = await getAuthSession();
 
   const supabase = createServerServiceClient();
 

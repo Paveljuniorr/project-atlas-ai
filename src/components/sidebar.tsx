@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useSession } from "next-auth/react";
 import { 
   LayoutDashboard, 
   Users, 
@@ -20,7 +21,6 @@ import {
   Layers
 } from "lucide-react";
 import { clsx } from "clsx";
-import { useUser } from "@clerk/nextjs";
 
 const mainNavItems = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
@@ -38,7 +38,7 @@ const workspaces = [
 
 export function Sidebar() {
   const pathname = usePathname();
-  const { user } = useUser();
+  const { data: session } = useSession();
   const [selectedWs, setSelectedWs] = useState(workspaces[0]);
   const [wsMenuOpen, setWsMenuOpen] = useState(false);
 
@@ -143,15 +143,23 @@ export function Sidebar() {
       <div className="p-3.5 border-t border-slate-200 bg-slate-50/50">
         <div className="flex items-center justify-between gap-2 p-2 rounded-xl border border-slate-200/70 bg-white shadow-xs">
           <div className="flex items-center gap-2 min-w-0">
-            <div className="h-7 w-7 rounded-full bg-indigo-100 text-indigo-700 font-bold flex items-center justify-center text-xs shrink-0 border border-indigo-200">
-              {user?.firstName ? user.firstName[0] : "A"}
-            </div>
+            {session?.user?.image ? (
+              <img
+                src={session.user.image}
+                alt={session.user.name || "User"}
+                className="h-7 w-7 rounded-full shrink-0 border border-indigo-200"
+              />
+            ) : (
+              <div className="h-7 w-7 rounded-full bg-indigo-100 text-indigo-700 font-bold flex items-center justify-center text-xs shrink-0 border border-indigo-200">
+                {session?.user?.name?.[0] || "A"}
+              </div>
+            )}
             <div className="min-w-0 flex-1">
               <div className="text-xs font-bold text-slate-900 truncate">
-                {user?.fullName || "Atlas Operator"}
+                {session?.user?.name || "Atlas Operator"}
               </div>
               <div className="text-[10px] font-medium text-slate-500 truncate">
-                {user?.primaryEmailAddress?.emailAddress || "admin@atlas.ai"}
+                {session?.user?.email || "admin@atlas.ai"}
               </div>
             </div>
           </div>
@@ -161,5 +169,3 @@ export function Sidebar() {
     </aside>
   );
 }
-
-

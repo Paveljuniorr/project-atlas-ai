@@ -1,11 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { UserButton, OrganizationSwitcher } from "@clerk/nextjs";
-import { Bell, Search, Sparkles, Check, Clock, Bot, X } from "lucide-react";
+import { useSession, signOut } from "next-auth/react";
+import { Bell, Search, Sparkles, Check, Clock, Bot, X, LogOut } from "lucide-react";
 
 export function Header() {
   const [notifOpen, setNotifOpen] = useState(false);
+  const { data: session } = useSession();
 
   const notifications = [
     { id: 1, title: "New Qualified Lead", desc: "Sarah Connor scored 94/100 via WhatsApp", time: "5m ago", icon: Sparkles, color: "text-indigo-600 bg-indigo-50" },
@@ -31,14 +32,6 @@ export function Header() {
       </div>
 
       <div className="flex items-center gap-3">
-        <OrganizationSwitcher 
-          appearance={{
-            elements: {
-              organizationSwitcherTrigger: "py-1.5 px-3 rounded-xl hover:bg-slate-100 text-slate-700 font-semibold text-xs transition-colors border border-slate-200 bg-white shadow-xs",
-            }
-          }}
-        />
-
         {/* Notifications Popover */}
         <div className="relative">
           <button 
@@ -86,19 +79,28 @@ export function Header() {
           )}
         </div>
 
-        {/* User Button */}
-        <div className="pl-1">
-          <UserButton 
-            appearance={{
-              elements: {
-                userButtonAvatarBox: "h-8 w-8 ring-2 ring-indigo-500/20 shadow-xs",
-              }
-            }}
-          />
+        {/* User Avatar & Sign Out */}
+        <div className="pl-1 flex items-center gap-2">
+          {session?.user?.image ? (
+            <img
+              src={session.user.image}
+              alt={session.user.name || "User"}
+              className="h-8 w-8 rounded-full ring-2 ring-indigo-500/20 shadow-xs"
+            />
+          ) : (
+            <div className="h-8 w-8 rounded-full bg-indigo-100 text-indigo-700 font-bold flex items-center justify-center text-xs ring-2 ring-indigo-500/20 shadow-xs">
+              {session?.user?.name?.[0] || "A"}
+            </div>
+          )}
+          <button
+            onClick={() => signOut({ callbackUrl: "/" })}
+            className="p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition"
+            title="Sign out"
+          >
+            <LogOut className="h-4 w-4" />
+          </button>
         </div>
       </div>
     </header>
   );
 }
-
-

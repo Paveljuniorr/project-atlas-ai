@@ -3,12 +3,11 @@
 import { generateText } from "ai";
 import { google } from "@ai-sdk/google";
 import { createServerServiceClient } from "@/lib/supabase";
-import { auth } from "@clerk/nextjs/server";
+import { getAuthSession } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
 
 export async function generateAiDraft(conversationId: string, triggerMessageId: string) {
-  const { userId, orgId } = await auth();
-  if (!userId) throw new Error("Unauthorized");
+  const { userId } = await getAuthSession();
 
   const supabase = createServerServiceClient();
 
@@ -36,7 +35,6 @@ export async function generateAiDraft(conversationId: string, triggerMessageId: 
   const { data: org } = await supabase
     .from("organizations")
     .select("ai_settings")
-    // .eq("id", orgId) // uncomment in real multi-tenant
     .single();
 
   const tone = org?.ai_settings?.tone || "professional";
@@ -70,7 +68,6 @@ export async function generateAiDraft(conversationId: string, triggerMessageId: 
         status: "generated",
         model: { provider: "google", name: "gemini-1.5-flash" },
         requested_by_id: userId,
-        // org_id: orgId 
       })
       .select()
       .single();

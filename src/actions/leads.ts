@@ -1,27 +1,17 @@
 "use server";
 
 import { createServerServiceClient } from "@/lib/supabase";
-import { auth } from "@clerk/nextjs/server";
+import { getAuthSession } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
 
 export async function getLeads() {
-  const { userId, orgId } = await auth();
-  
-  if (!userId) {
-    throw new Error("Unauthorized");
-  }
-
-  // Use the active organization, or fallback to user's personal context if no org is active
-  // In a real multi-tenant app, we'd ensure orgId is always present.
-  const effectiveOrgId = orgId || "default-org-id"; // Placeholder if Clerk orgs aren't strictly enforced yet
+  const { userId } = await getAuthSession();
 
   const supabase = createServerServiceClient();
 
   const { data: leads, error } = await supabase
     .from("leads")
     .select("*")
-    // In production, uncomment the next line when Clerk orgs are mapped to Supabase organizations
-    // .eq("org_id", effectiveOrgId) 
     .order("created_at", { ascending: false });
 
   if (error) {
@@ -33,13 +23,8 @@ export async function getLeads() {
 }
 
 export async function createLead(formData: FormData) {
-  const { userId, orgId } = await auth();
-  
-  if (!userId) {
-    throw new Error("Unauthorized");
-  }
+  const { userId } = await getAuthSession();
 
-  const effectiveOrgId = orgId || "default-org-id";
   const supabase = createServerServiceClient();
 
   const newLead = {
@@ -49,7 +34,6 @@ export async function createLead(formData: FormData) {
     company_name: formData.get("company_name") as string,
     stage_id: "new",
     source: "manual",
-    // org_id: effectiveOrgId // Uncomment when orgs are fully synced
   };
 
   const { error } = await supabase
@@ -66,8 +50,7 @@ export async function createLead(formData: FormData) {
 }
 
 export async function updateLeadStage(leadId: string, newStageId: string) {
-  const { userId } = await auth();
-  if (!userId) throw new Error("Unauthorized");
+  const { userId } = await getAuthSession();
 
   const supabase = createServerServiceClient();
 

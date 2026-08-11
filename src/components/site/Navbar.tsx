@@ -3,12 +3,13 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Menu, X, Sparkles, ArrowRight } from 'lucide-react';
-import { useAuth, UserButton } from '@clerk/nextjs';
+import { useSession, signOut } from 'next-auth/react';
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const { isSignedIn } = useAuth();
+  const { data: session } = useSession();
+  const isSignedIn = !!session;
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 10);
@@ -84,7 +85,17 @@ export default function Navbar() {
                 >
                   Go to Dashboard <ArrowRight className="size-4" />
                 </Link>
-                <UserButton />
+                {session?.user?.image ? (
+                  <img
+                    src={session.user.image}
+                    alt={session.user.name || "User"}
+                    className="h-8 w-8 rounded-full ring-2 ring-indigo-500/20"
+                  />
+                ) : (
+                  <div className="h-8 w-8 rounded-full bg-indigo-100 text-indigo-700 font-bold flex items-center justify-center text-xs">
+                    {session?.user?.name?.[0] || "A"}
+                  </div>
+                )}
               </>
             )}
           </div>
@@ -130,6 +141,3 @@ export default function Navbar() {
     </header>
   );
 }
-
-
-
