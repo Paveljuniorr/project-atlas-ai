@@ -1,3 +1,5 @@
+'use client';
+
 import SectionHeading from '@/components/ui/SectionHeading';
 import Reveal from '@/components/ui/Reveal';
 
