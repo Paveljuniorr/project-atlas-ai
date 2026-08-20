@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { createServerServiceClient } from "@/lib/supabase";
 import { twilioWebhookSchema } from "@/lib/validators";
 import { checkRateLimit } from "@/lib/rate-limit";
-import { sanitizeHtml } from "@/lib/security";
+import { ingestInboundMessage } from "@/server/services/conversation-engine";
+import { createMessagingProvider } from "@/server/integrations/providers";
 import { logger } from "@/lib/logger";
 
 export async function POST(req: NextRequest) {
@@ -15,98 +16,62 @@ export async function POST(req: NextRequest) {
 
     const textData = await req.text();
     const params = new URLSearchParams(textData);
-
-    const rawFrom = params.get("From");
-    const rawBody = params.get("Body");
-    const messageSid = params.get("MessageSid");
-
-    const validated = twilioWebhookSchema.parse({ From: rawFrom, Body: rawBody, MessageSid: messageSid });
-
-    const channel = validated.From.startsWith("whatsapp:") ? "whatsapp" : "sms";
-    const phoneNormalized = validated.From.replace("whatsapp:", "").trim();
-    const bodySanitized = sanitizeHtml(validated.Body);
+    const validated = twilioWebhookSchema.parse({
+      From: params.get("From"),
+      Body: params.get("Body"),
+      MessageSid: params.get("MessageSid"),
+    });
 
     const supabase = createServerServiceClient();
 
-    // Multitenant mapping by org lookup
-    const { data: orgs } = await supabase.from("organizations").select("id").limit(1);
-    const orgId = orgs?.[0]?.id;
+    const toNumber = params.get("To")?.replace("whatsapp:", "") || "";
+    const { data: integration } = await supabase
+      .from("integrations")
+      .select("id, org_id, config")
+      .eq("type", "whatsapp")
+      .eq("status", "connected")
+      .maybeSingle();
 
+    const orgId = integration?.org_id;
     if (!orgId) {
-      logger.error("Twilio webhook error: No active organization found");
+      const { data: orgs } = await supabase.from("organizations").select("id").limit(1);
+      if (!orgs?.[0]?.id) {
+        return NextResponse.json({ error: "Organization Configuration Missing" }, { status: 500 });
+      }
+    }
+
+    const resolvedOrgId = orgId || (await supabase.from("organizations").select("id").limit(1).single()).data?.id;
+    if (!resolvedOrgId) {
       return NextResponse.json({ error: "Organization Configuration Missing" }, { status: 500 });
     }
 
-    // 1. Find or create lead
-    let { data: lead } = await supabase
-      .from("leads")
-      .select("id")
-      .eq("org_id", orgId)
-      .eq("phone", phoneNormalized)
-      .maybeSingle();
-
-    if (!lead) {
-      const { data: newLead } = await supabase
-        .from("leads")
-        .insert({
-          org_id: orgId,
-          phone: phoneNormalized,
-          source: channel,
-          stage_id: "new",
-        })
-        .select("id")
-        .single();
-      lead = newLead;
-    }
-
-    // 2. Find or create conversation
-    let { data: conversation } = await supabase
-      .from("conversations")
-      .select("id")
-      .eq("org_id", orgId)
-      .eq("lead_id", lead?.id)
-      .eq("channel", channel)
-      .maybeSingle();
-
-    if (!conversation) {
-      const { data: newConversation } = await supabase
-        .from("conversations")
-        .insert({
-          org_id: orgId,
-          lead_id: lead?.id,
-          channel,
-          participant_address: phoneNormalized,
-        })
-        .select("id")
-        .single();
-      conversation = newConversation;
-    }
-
-    // 3. Insert incoming message
-    await supabase.from("messages").insert({
-      org_id: orgId,
-      conversation_id: conversation?.id,
-      lead_id: lead?.id,
-      direction: "inbound",
-      status: "delivered",
-      body: bodySanitized,
-      sender_type: "lead",
-      external_message_id: validated.MessageSid || null,
+    const provider = createMessagingProvider("twilio", {
+      accountSid: process.env.TWILIO_ACCOUNT_SID || "",
+      authToken: process.env.TWILIO_AUTH_TOKEN || "",
+      fromNumber: toNumber,
     });
 
-    // 4. Update unread count and preview
-    await supabase.rpc('increment_unread_count', { conv_id: conversation?.id });
-    await supabase
-      .from("conversations")
-      .update({ last_message_preview: bodySanitized.substring(0, 100) })
-      .eq("id", conversation?.id)
-      .eq("org_id", orgId);
+    const normalized = await provider.parseInboundWebhook(
+      Object.fromEntries(params.entries()),
+      req.headers
+    );
+
+    if (!normalized) {
+      return new NextResponse("<Response></Response>", { status: 200, headers: { "Content-Type": "text/xml" } });
+    }
+
+    await ingestInboundMessage({
+      orgId: resolvedOrgId,
+      integrationId: integration?.id,
+      message: normalized,
+      source: "twilio",
+    });
 
     return new NextResponse("<Response></Response>", {
       status: 200,
       headers: { "Content-Type": "text/xml" },
     });
-  } catch (error: any) {
+  } catch (error) {
     logger.error("Twilio Webhook Error", error);
     return NextResponse.json({ error: "Invalid Request Payload" }, { status: 400 });
   }

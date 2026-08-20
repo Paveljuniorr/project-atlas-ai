@@ -3,15 +3,15 @@ import Stripe from "stripe";
 import { createServerServiceClient } from "@/lib/supabase";
 import { logger } from "@/lib/logger";
 
-const stripeSecretKey = process.env.STRIPE_SECRET_KEY || "";
-const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET || "";
-
-const stripe = new Stripe(stripeSecretKey, {
-  apiVersion: "2025-02-24.acacia" as any,
-});
+function getStripe() {
+  const key = process.env.STRIPE_SECRET_KEY;
+  if (!key) throw new Error("Stripe not configured");
+  return new Stripe(key, { apiVersion: "2025-02-24.acacia" as Stripe.LatestApiVersion });
+}
 
 export async function POST(req: NextRequest) {
   try {
+    const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET || "";
     const body = await req.text();
     const signature = req.headers.get("stripe-signature");
 
@@ -23,7 +23,7 @@ export async function POST(req: NextRequest) {
     let event: Stripe.Event;
 
     try {
-      event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
+      event = getStripe().webhooks.constructEvent(body, signature, webhookSecret);
     } catch (err: any) {
       logger.error("Stripe Webhook Signature Verification Failed", err);
       return NextResponse.json({ error: "Invalid Webhook Signature" }, { status: 400 });

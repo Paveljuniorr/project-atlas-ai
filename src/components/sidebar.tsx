@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useSession } from "next-auth/react";
+import { useUser } from "@clerk/nextjs";
 import { 
   LayoutDashboard, 
   Users, 
@@ -41,9 +41,12 @@ const workspaces = [
 
 export function Sidebar() {
   const pathname = usePathname();
-  const { data: session } = useSession();
+  const { user } = useUser();
   const [selectedWs, setSelectedWs] = useState(workspaces[0]);
   const [wsMenuOpen, setWsMenuOpen] = useState(false);
+
+  const fullName = `${user?.firstName || ""} ${user?.lastName || ""}`.trim() || user?.username || "Atlas Operator";
+  const email = user?.emailAddresses?.[0]?.emailAddress || "admin@atlas.ai";
 
   return (
     <aside className="w-64 border-r border-slate-200 bg-white text-slate-900 flex flex-col hidden md:flex h-screen shrink-0 select-none">
@@ -146,23 +149,23 @@ export function Sidebar() {
       <div className="p-3.5 border-t border-slate-200 bg-slate-50/50">
         <div className="flex items-center justify-between gap-2 p-2 rounded-xl border border-slate-200/70 bg-white shadow-xs">
           <div className="flex items-center gap-2 min-w-0">
-            {session?.user?.image ? (
+            {user?.imageUrl ? (
               <img
-                src={session.user.image}
-                alt={session.user.name || "User"}
+                src={user.imageUrl}
+                alt={fullName}
                 className="h-7 w-7 rounded-full shrink-0 border border-indigo-200"
               />
             ) : (
               <div className="h-7 w-7 rounded-full bg-indigo-100 text-indigo-700 font-bold flex items-center justify-center text-xs shrink-0 border border-indigo-200">
-                {session?.user?.name?.[0] || "A"}
+                {fullName[0] || "A"}
               </div>
             )}
             <div className="min-w-0 flex-1">
               <div className="text-xs font-bold text-slate-900 truncate">
-                {session?.user?.name || "Atlas Operator"}
+                {fullName}
               </div>
               <div className="text-[10px] font-medium text-slate-500 truncate">
-                {session?.user?.email || "admin@atlas.ai"}
+                {email}
               </div>
             </div>
           </div>

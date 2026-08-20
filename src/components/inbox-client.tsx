@@ -3,14 +3,18 @@
 import { useState, useTransition } from "react";
 import { Search, Filter, MessageSquare, Bot, Send } from "lucide-react";
 import { getConversationMessages, markConversationRead } from "@/actions/inbox";
-import { generateAiDraft } from "@/actions/ai";
+import { generateAiDraft, acceptAiDraftAndSend } from "@/actions/ai";
+import { sendMessage } from "@/actions/messages";
 
 export function InboxClient({ initialConversations }: { initialConversations: any[] }) {
   const [selectedConv, setSelectedConv] = useState<string | null>(null);
   const [messages, setMessages] = useState<any[]>([]);
   const [isLoading, startTransition] = useTransition();
   const [draft, setDraft] = useState<string | null>(null);
+  const [draftId, setDraftId] = useState<string | null>(null);
+  const [compose, setCompose] = useState("");
   const [isDrafting, setIsDrafting] = useState(false);
+  const [isSending, setIsSending] = useState(false);
 
   const handleSelectConv = (convId: string) => {
     setSelectedConv(convId);
@@ -30,12 +34,35 @@ export function InboxClient({ initialConversations }: { initialConversations: an
       const result = await generateAiDraft(selectedConv, lastMsg.id);
       if (result.success && result.draft) {
         setDraft(result.draft.draft_body);
+        setDraftId(result.draft.id);
       }
     } catch (e) {
       console.error(e);
       alert("Failed to generate draft.");
     } finally {
       setIsDrafting(false);
+    }
+  };
+
+  const handleSend = async (body: string, aiResponseId?: string) => {
+    if (!selectedConv || !body.trim()) return;
+    setIsSending(true);
+    try {
+      if (aiResponseId) {
+        await acceptAiDraftAndSend(selectedConv, aiResponseId, body);
+      } else {
+        await sendMessage({ conversationId: selectedConv, body });
+      }
+      const msgs = await getConversationMessages(selectedConv);
+      setMessages(msgs);
+      setDraft(null);
+      setDraftId(null);
+      setCompose("");
+    } catch (e) {
+      console.error(e);
+      alert(e instanceof Error ? e.message : "Failed to send message");
+    } finally {
+      setIsSending(false);
     }
   };
 
@@ -141,18 +168,30 @@ export function InboxClient({ initialConversations }: { initialConversations: an
                     className="w-full text-sm bg-transparent border-none focus:ring-0 resize-none outline-none h-24"
                   />
                   <div className="flex justify-end gap-2 mt-2">
-                    <button onClick={() => setDraft(null)} className="text-xs font-medium text-gray-500 hover:text-gray-900">Discard</button>
-                    <button className="text-xs font-medium bg-indigo-600 text-white px-3 py-1.5 rounded hover:bg-indigo-700">Approve & Send</button>
+                    <button onClick={() => { setDraft(null); setDraftId(null); }} className="text-xs font-medium text-gray-500 hover:text-gray-900">Discard</button>
+                    <button
+                      onClick={() => draftId && handleSend(draft, draftId)}
+                      disabled={isSending}
+                      className="text-xs font-medium bg-indigo-600 text-white px-3 py-1.5 rounded hover:bg-indigo-700 disabled:opacity-50"
+                    >
+                      {isSending ? "Sending..." : "Approve & Send"}
+                    </button>
                   </div>
                 </div>
               ) : (
                 <div className="relative">
-                  <textarea 
+                  <textarea
+                    value={compose}
+                    onChange={(e) => setCompose(e.target.value)}
                     placeholder="Type a message..."
                     className="w-full border border-gray-200 dark:border-zinc-800 rounded-lg px-4 py-3 pr-12 text-sm bg-gray-50 dark:bg-zinc-900 outline-none focus:ring-2 focus:ring-blue-500 resize-none"
                     rows={1}
                   />
-                  <button className="absolute right-2 top-2 p-1.5 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
+                  <button
+                    onClick={() => handleSend(compose)}
+                    disabled={isSending || !compose.trim()}
+                    className="absolute right-2 top-2 p-1.5 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50"
+                  >
                     <Send className="h-4 w-4" />
                   </button>
                 </div>

@@ -1,19 +1,24 @@
-import { getServerSession } from "next-auth";
+import { currentUser, auth } from "@clerk/nextjs/server";
+import { getUserContext } from "./rbac";
 
 /**
- * Helper to get the current user's session in server actions.
- * Returns { userId, email, name } or throws if unauthenticated.
+ * Server-side helper to get authenticated user session.
  */
 export async function getAuthSession() {
-  const session = await getServerSession();
-
-  if (!session?.user) {
-    throw new Error("Unauthorized");
+  const user = await currentUser();
+  if (!user || !user.emailAddresses?.[0]?.emailAddress) {
+    throw new Error("UNAUTHORIZED: Authentication required");
   }
 
+  const email = user.emailAddresses[0].emailAddress;
+  const name = `${user.firstName || ""} ${user.lastName || ""}`.trim() || user.username || email;
+
   return {
-    userId: (session.user as any).id || session.user.email,
-    email: session.user.email,
-    name: session.user.name,
+    userId: user.id,
+    email,
+    name,
+    imageUrl: user.imageUrl,
   };
 }
+
+export { getUserContext };

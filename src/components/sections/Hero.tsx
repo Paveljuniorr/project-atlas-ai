@@ -2,11 +2,10 @@
 
 import { Sparkles, ArrowRight, ShieldCheck, Zap, Bot, Users, BarChart3, Check } from 'lucide-react';
 import Link from 'next/link';
-import { useSession } from 'next-auth/react';
+import { useAuth } from '@clerk/nextjs';
 
 export default function Hero() {
-  const { data: session } = useSession();
-  const isSignedIn = !!session;
+  const { isSignedIn } = useAuth();
 
   return (
     <section className="relative pt-32 pb-20 overflow-hidden bg-slate-50 border-b border-slate-200/80">
@@ -59,45 +58,49 @@ export default function Hero() {
             </Link>
           </div>
 
-          <div className="mt-6 flex items-center justify-center gap-6 text-xs font-medium text-slate-500">
-            <span className="flex items-center gap-1.5"><Check className="size-4 text-emerald-600" /> Instant Google Single Sign-On</span>
-            <span className="flex items-center gap-1.5"><Check className="size-4 text-emerald-600" /> Automatic Org & Workspace Provisioning</span>
+          <div className="mt-8 flex items-center justify-center gap-6 text-xs font-semibold text-slate-500">
+            <span className="flex items-center gap-1.5"><ShieldCheck className="size-4 text-emerald-500" /> Enterprise RBAC Security</span>
+            <span className="flex items-center gap-1.5"><Zap className="size-4 text-amber-500" /> WhatsApp & Omnichannel</span>
+            <span className="flex items-center gap-1.5"><Check className="size-4 text-indigo-500" /> Google Single Sign-On</span>
           </div>
         </div>
 
-        {/* Product Preview Card */}
-        <div id="solution" className="mt-14 relative rounded-2xl border border-slate-200/80 bg-white p-3 shadow-2xl">
-          <div className="rounded-xl border border-slate-200/60 bg-slate-50 p-4 sm:p-6">
-            <div className="flex items-center justify-between border-b border-slate-200 pb-4 mb-6">
-              <div className="flex items-center gap-2">
-                <span className="size-3 rounded-full bg-slate-300" />
-                <span className="size-3 rounded-full bg-slate-300" />
-                <span className="size-3 rounded-full bg-slate-300" />
-                <span className="ml-2 text-xs font-semibold text-slate-400">Atlas AI Workspace Engine</span>
+        {/* Feature Cards Grid */}
+        <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+          <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm hover:shadow-md transition">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="p-2.5 rounded-xl bg-indigo-50 text-indigo-600">
+                <Bot className="size-5" />
               </div>
-              <div className="inline-flex items-center gap-1.5 rounded-md bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700 border border-emerald-200">
-                <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                System Active
-              </div>
+              <h2 className="font-bold text-slate-900 text-sm">Autonomous Lead Qualification</h2>
             </div>
+            <p className="text-xs text-slate-600 leading-relaxed">
+              AI evaluates intent, budget, and urgency from incoming messages and updates stage & score instantly.
+            </p>
+          </div>
 
-            <div className="grid gap-4 sm:grid-cols-3">
-              <div className="rounded-xl bg-white p-4 border border-slate-200 shadow-sm">
-                <div className="text-xs font-medium text-slate-500">Monthly Recurring Revenue</div>
-                <div className="mt-1 text-2xl font-bold text-slate-900">$128,450</div>
-                <div className="mt-2 text-xs font-semibold text-emerald-600">+14.2% from last month</div>
+          <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm hover:shadow-md transition">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="p-2.5 rounded-xl bg-emerald-50 text-emerald-600">
+                <Users className="size-5" />
               </div>
-              <div className="rounded-xl bg-white p-4 border border-slate-200 shadow-sm">
-                <div className="text-xs font-medium text-slate-500">Qualified Leads Captured</div>
-                <div className="mt-1 text-2xl font-bold text-slate-900">1,248</div>
-                <div className="mt-2 text-xs font-semibold text-indigo-600">89% AI qualification rate</div>
-              </div>
-              <div className="rounded-xl bg-white p-4 border border-slate-200 shadow-sm">
-                <div className="text-xs font-medium text-slate-500">Avg. AI Response Time</div>
-                <div className="mt-1 text-2xl font-bold text-slate-900">1.8s</div>
-                <div className="mt-2 text-xs font-semibold text-slate-600">24/7 Autonomous agent</div>
-              </div>
+              <h2 className="font-bold text-slate-900 text-sm">Omnichannel Unified Inbox</h2>
             </div>
+            <p className="text-xs text-slate-600 leading-relaxed">
+              Consolidate WhatsApp Cloud, Twilio SMS, and Email into a single conversation stream with AI drafts.
+            </p>
+          </div>
+
+          <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm hover:shadow-md transition">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="p-2.5 rounded-xl bg-amber-50 text-amber-600">
+                <BarChart3 className="size-5" />
+              </div>
+              <h2 className="font-bold text-slate-900 text-sm">Real-Time Revenue Analytics</h2>
+            </div>
+            <p className="text-xs text-slate-600 leading-relaxed">
+              Track conversion rates, AI response acceptance, pipeline stages, and upcoming appointment velocity.
+            </p>
           </div>
         </div>
       </div>
