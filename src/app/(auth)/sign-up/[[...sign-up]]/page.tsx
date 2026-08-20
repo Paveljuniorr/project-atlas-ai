@@ -6,7 +6,9 @@ import Link from "next/link";
 import { Sparkles, AlertCircle } from "lucide-react";
 
 export default function SignUpPage() {
-  const { signUp, isLoaded } = useSignUp();
+  const clerkSignUp = useSignUp() as any;
+  const signUp = clerkSignUp?.signUp;
+  const isLoaded = clerkSignUp?.isLoaded;
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 

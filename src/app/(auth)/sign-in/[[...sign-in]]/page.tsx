@@ -6,7 +6,9 @@ import Link from "next/link";
 import { Sparkles, AlertCircle, ArrowRight } from "lucide-react";
 
 export default function SignInPage() {
-  const { signIn, isLoaded } = useSignIn();
+  const clerkSignIn = useSignIn() as any;
+  const signIn = clerkSignIn?.signIn;
+  const isLoaded = clerkSignIn?.isLoaded;
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
