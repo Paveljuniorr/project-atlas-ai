@@ -82,7 +82,6 @@ export function Header() {
         {/* Clerk User Button & Profile */}
         <div className="pl-1 flex items-center">
           <UserButton
-            afterSignOutUrl="/"
             appearance={{
               elements: {
                 avatarBox: "h-8 w-8 rounded-full ring-2 ring-indigo-500/20 shadow-xs",

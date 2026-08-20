@@ -78,7 +78,7 @@ export default function Navbar() {
                 >
                   Dashboard
                 </Link>
-                <UserButton afterSignOutUrl="/" />
+                <UserButton />
               </div>
             )}
           </div>
